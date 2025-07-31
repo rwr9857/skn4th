@@ -1,0 +1,209 @@
+:root {
+  --primary-color: #007bff;
+  --secondary-color: #6c757d;
+  --success-color: #28a745;
+  --info-color: #17a2b8;
+  --warning-color: #ffc107;
+  --danger-color: #dc3545;
+  --light-color: #ffffff;
+  --dark-color: #343a40;
+}
+
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #fdfdfd;
+  color: #212529;
+}
+
+.main-header {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  color: #0d47a1;
+  padding: 30px;
+  text-align: center;
+}
+
+.main-header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+  text-shadow: none;
+}
+
+.main-header p {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  margin-bottom: 0;
+}
+
+.main-footer {
+  background: #343a40;
+  color: white;
+  text-align: center;
+  padding: 20px;
+  margin-top: 30px;
+}
+
+
+.main-container {
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+  margin: 20px 0;
+  overflow: hidden;
+}
+
+.conversation-list {
+  background: #f8f9fa;
+  border-right: 1px solid #dee2e6;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.conversation-item {
+  color: #212529;
+  background: transparent;
+  transition: background 0.3s ease;
+}
+
+.conversation-item:hover {
+  background: #f1f3f5;
+}
+
+.conversation-item.active {
+  background: var(--primary-color);
+  color: white;
+}
+
+.new-chat-btn {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+}
+
+.new-chat-btn:hover {
+  background: #218838;
+  box-shadow: 0 6px 12px rgba(40, 167, 69, 0.4);
+}
+
+.chat-messages {
+  background: #ffffff;
+  border: 1px solid #dee2e6;
+  height: 400px;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.message-content {
+  background: #f8f9fa;
+  color: #212529;
+}
+
+.message.user .message-content {
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  color: white;
+}
+
+.message.bot .message-content {
+  background: #e9ecef;
+  color: #212529;
+}
+
+.avatar.user {
+  background: #007bff;
+  color: white;
+}
+
+.avatar.bot {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.system-message {
+  background: #f1f3f5;
+  color: #6c757d;
+  border-left: 4px solid var(--primary-color);
+}
+
+.typing-indicator {
+  color: #6c757d;
+}
+
+.chat-input-form {
+  background: #ffffff;
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.form-control {
+  background: #ffffff;
+  color: #212529;
+}
+
+.send-btn {
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  color: white;
+}
+
+.send-btn:hover {
+  background: #0069d9;
+}
+
+.image-upload-area {
+  border: 2px dashed #dee2e6;
+  border-radius: 10px;
+  padding: 30px;
+  text-align: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  margin-top: 15px;
+}
+
+.image-upload-area:hover {
+  border-color: var(--primary-color);
+  background: rgba(0, 123, 255, 0.05);
+}
+
+.image-upload-area.dragover {
+  border-color: var(--success-color);
+  background: rgba(40, 167, 69, 0.1);
+}
+
+.product-info {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  color: #0d47a1;
+}
+
+.sidebar {
+  background: #f8f9fa;
+  border-left: 1px solid #dee2e6;
+}
+
+.btn-danger-custom {
+  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+  color: white;
+}
+
+.btn-success-custom {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+  .main-header h1 {
+    font-size: 2rem;
+  }
+
+  .message-content {
+    max-width: 85%;
+  }
+
+  .conversation-list {
+    max-height: 40vh;
+  }
+
+  .chat-messages {
+    height: 300px;
+  }
+}
