@@ -122,6 +122,28 @@ function hideTypingIndicator() {
   }
 }
 
+function escapeHtml(text) {
+  const div = document.createElement("div");
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function formatMessageContent(content) {
+  // HTML 이스케이프 먼저 수행 (보안상 안전하게)
+  const escaped = escapeHtml(content);
+
+  // # 헤더 스타일 변환 (간단히 한 줄만 h1 처리)
+  const lines = escaped.split("\n").map(line => {
+    if (line.startsWith("### ")) return `<h3>${line.slice(4)}</h3>`;
+    if (line.startsWith("## ")) return `<h2>${line.slice(3)}</h2>`;
+    if (line.startsWith("# ")) return `<h1>${line.slice(2)}</h1>`;
+    return line;
+  });
+
+  // 줄바꿈 처리
+  return lines.join("<br>");
+}
+
 // 채팅 화면 업데이트
 function updateChatDisplay() {
   const messages = conversations[currentConversationId].messages;
@@ -132,25 +154,19 @@ function updateChatDisplay() {
 
     if (message.role === "system") {
       messageDiv.className = "system-message";
-      messageDiv.innerHTML = `<i class="fas fa-info-circle"></i> ${message.content}`;
+      messageDiv.innerHTML = `<i class="fas fa-info-circle"></i> ${escapeHtml(message.content)}`;
     } else {
       messageDiv.className = `message ${message.role}`;
       const avatar = message.role === "user" ? "👤" : "🤖";
       const avatarClass = message.role === "user" ? "user" : "bot";
 
+      const formattedContent = formatMessageContent(message.content);
+
       messageDiv.innerHTML = `
-                        ${
-                          message.role === "user"
-                            ? ""
-                            : `<div class="avatar ${avatarClass}">${avatar}</div>`
-                        }
-                        <div class="message-content">${message.content}</div>
-                        ${
-                          message.role === "user"
-                            ? `<div class="avatar ${avatarClass}">${avatar}</div>`
-                            : ""
-                        }
-                    `;
+        ${message.role === "user" ? "" : `<div class="avatar ${avatarClass}">${avatar}</div>`}
+        <div class="message-content">${formattedContent}</div>
+        ${message.role === "user" ? `<div class="avatar ${avatarClass}">${avatar}</div>` : ""}
+      `;
     }
 
     chatMessages.appendChild(messageDiv);

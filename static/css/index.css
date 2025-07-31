@@ -146,12 +146,12 @@
 }
 
 .avatar.user {
-  background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+  background: #f1f3f5;
   color: white;
 }
 
 .avatar.bot {
-  background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+  background: #f1f3f5;
   color: #333;
 }
 
