@@ -56,19 +56,36 @@ function setupEventListeners() {
 }
 
 // 채팅 제출 처리
-function handleChatSubmit(e) {
+async function handleChatSubmit(e) {
   e.preventDefault();
   const message = messageInput.value.trim();
-  if (!message && !conversations[currentConversationId].image) return;
+  const currentConv = conversations[currentConversationId];
+
+  if (!message && !currentConv.image) return;
 
   if (message) {
     addMessage("user", message);
     messageInput.value = "";
   }
 
-  // 봇 응답 시뮬레이션
-  simulateBotResponse(message);
+  // 서버 연동
+  const history = currentConv.messages
+    .filter((m) => m.role !== "system")
+    .map((m) => ({ role: m.role, content: m.content }));
+
+  showTypingIndicator();
+  try {
+    const response = await sendChatQuery(message, history);
+    console.log("서버 응답:", response);
+    hideTypingIndicator();
+    addMessage("assistant", response.response || "응답을 불러오지 못했습니다.");
+  } catch (error) {
+    hideTypingIndicator();
+    addMessage("assistant", "서버 오류가 발생했습니다.");
+    console.error("Chat API error:", error);
+  }
 }
+
 
 // 메시지 추가
 function addMessage(role, content) {
@@ -79,34 +96,9 @@ function addMessage(role, content) {
   });
   updateChatDisplay();
   updateStats();
+  scrollToBottom();
 }
 
-// 봇 응답 시뮬레이션
-function simulateBotResponse(userMessage) {
-  isTyping = true;
-  showTypingIndicator();
-
-  setTimeout(() => {
-    isTyping = false;
-    hideTypingIndicator();
-
-    // 간단한 응답 시뮬레이션
-    let response = generateBotResponse(userMessage);
-    addMessage("assistant", response);
-  }, 2000);
-}
-
-// 봇 응답 생성 (실제로는 서버 API 호출)
-function generateBotResponse(userMessage) {
-  const responses = [
-    "세탁기 관련 문의를 확인했습니다. 매뉴얼을 검색 중입니다...",
-    "건조기 사용법에 대한 정보를 찾았습니다. 자세한 내용을 안내드리겠습니다.",
-    "업로드하신 이미지를 분석했습니다. 해당 모델의 사용법을 설명드리겠습니다.",
-    "에러 코드 해결 방법을 매뉴얼에서 찾았습니다. 단계별로 안내드리겠습니다.",
-    "필터 청소 방법에 대한 상세한 가이드를 제공드리겠습니다.",
-  ];
-  return responses[Math.floor(Math.random() * responses.length)];
-}
 // 타이핑 인디케이터
 function showTypingIndicator() {
   const typingDiv = document.createElement("div");
@@ -179,16 +171,26 @@ function handleImageUpload(e) {
 // 이미지 처리
 function processImage(file) {
   const reader = new FileReader();
-  reader.onload = function (e) {
+  reader.onload = async function (e) {
     conversations[currentConversationId].image = {
       src: e.target.result,
       name: file.name,
     };
     updateImageDisplay();
     addMessage("user", "이미지를 업로드했습니다.");
+
+    try {
+      const result = await uploadImageAndGetModelCode(file);
+      const modelInfo = result.model || "모델 정보를 찾을 수 없습니다.";
+      addMessage("assistant", `이미지 분석 결과: ${modelInfo}`);
+    } catch (err) {
+      console.error("Image upload error:", err);
+      addMessage("assistant", "이미지 분석 중 오류가 발생했습니다.");
+    }
   };
   reader.readAsDataURL(file);
 }
+
 
 // 이미지 표시 업데이트
 function updateImageDisplay() {
@@ -198,14 +200,13 @@ function updateImageDisplay() {
     imageDisplayArea.innerHTML = `
                     <img src="${currentImage.src}" alt="업로드된 이미지" class="uploaded-image">
                     <div class="product-info">
-                        <h6><i class="fas fa-tools"></i> 제품명: 분석 중...</h6>
-                        <h6><i class="fas fa-cog"></i> 모델명: 확인 중...</h6>
+                        <h6>제품명: 분석 중...</h6>
+                        <h6>모델명: 확인 중...</h6>
                     </div>
                 `;
   } else {
     imageDisplayArea.innerHTML = `
                     <div class="text-center text-muted">
-                        <i class="fas fa-image fa-3x mb-3"></i>
                         <p>현재 대화에 업로드된 이미지가 없습니다.</p>
                     </div>
                 `;
@@ -241,7 +242,7 @@ function createNewConversation() {
     messages: [
       {
         role: "system",
-        content: "새 대화가 시작되었습니다.",
+        content: "세탁기/건조기 매뉴얼 Q&A 챗봇이 시작되었습니다.",
       },
     ],
     image: null,
@@ -325,4 +326,29 @@ function updateStats() {
   );
   totalMessages.textContent = totalMsg;
   totalConversations.textContent = Object.keys(conversations).length;
+}
+
+function scrollToBottom() {
+  const chatBox = document.getElementById("chatMessages");
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+async function sendChatQuery(query, history=[]) {
+  const response = await fetch('/api/chat/', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query, history })
+  });
+  return await response.json();
+}
+
+async function uploadImageAndGetModelCode(imageFile) {
+  const formData = new FormData();
+  formData.append("image", imageFile);
+
+  const response = await fetch('/api/model-search/', {
+    method: 'POST',
+    body: formData
+  });
+  return await response.json();
 }
