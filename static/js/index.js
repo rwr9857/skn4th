@@ -154,7 +154,7 @@ function updateChatDisplay() {
 
     if (message.role === "system") {
       messageDiv.className = "system-message";
-      messageDiv.innerHTML = `<i class="fas fa-info-circle"></i> ${escapeHtml(message.content)}`;
+      messageDiv.innerHTML = `${escapeHtml(message.content)}`;
     } else {
       messageDiv.className = `message ${message.role}`;
       const avatar = message.role === "user" ? "👤" : "🤖";
@@ -278,7 +278,7 @@ function updateConversationList() {
       id === currentConversationId ? "active" : ""
     }`;
     button.setAttribute("data-id", id);
-    button.innerHTML = `<i class="fas fa-comment"></i> ${conversations[id].title}`;
+    button.innerHTML = `${conversations[id].title}`;
     button.addEventListener("click", () => switchConversation(id));
     conversationList.appendChild(button);
   });
