@@ -12,3 +12,14 @@ pip install -r requirements.txt
 # commit 전 코드포멧팅 체크
 pre-commit install
 ```
+
+### 루트디렉토리에 `.env` 포함하기
+
+```
+OPENAI_API_KEY
+MODEL_NAME
+TAVILY_API_KEY
+```
+
+### chatbot앱 아래에 `chroma` 백터 디비 포함하기
+- chroma는 3rd project에서 생성하시면 됩니다.
