@@ -158,8 +158,9 @@
 .system-message {
   background: #f1f3f5;
   color: #6c757d;
-  border-left: 4px solid var(--primary-color);
   margin-bottom: 10px;
+  text-align: center;
+  padding: 10px;
 }
 
 .typing-indicator {

@@ -59,7 +59,8 @@ function setupEventListeners() {
 async function handleChatSubmit(e) {
   e.preventDefault();
   const message = messageInput.value.trim();
-  const currentConv = conversations[currentConversationId];
+  const OriginConvId = currentConversationId;  // 요청 시점의 대화 ID 복사
+  const currentConv = conversations[OriginConvId];
 
   if (!message && !currentConv.image) return;
 
@@ -78,13 +79,42 @@ async function handleChatSubmit(e) {
     const response = await sendChatQuery(message, history);
     console.log("서버 응답:", response);
     hideTypingIndicator();
-    addMessage("assistant", response.response || "응답을 불러오지 못했습니다.");
+
+    const reply = response.response || "응답을 불러오지 못했습니다.";
+
+    // 응답 도착 시 현재 대화방 확인
+    if (OriginConvId === currentConversationId) {
+      addMessage("assistant", reply);
+    } else {
+      // 대화방이 바뀐 경우에도 원래 대화방에 응답 메시지 추가
+      conversations[OriginConvId].messages.push({
+        role: "assistant",
+        content: reply,
+        timestamp: new Date(),
+      });
+
+      console.warn("응답이 도착했지만 대화방이 바뀌어 해당 방에만 저장되었습니다.");
+    }
+
+    updateStats();
   } catch (error) {
     hideTypingIndicator();
-    addMessage("assistant", "서버 오류가 발생했습니다.");
+    const errorMsg = "서버 오류가 발생했습니다.";
+
+    if (OriginConvId === currentConversationId) {
+      addMessage("assistant", errorMsg);
+    } else {
+      conversations[OriginConvId].messages.push({
+        role: "assistant",
+        content: errorMsg,
+        timestamp: new Date(),
+      });
+    }
+
     console.error("Chat API error:", error);
   }
 }
+
 
 
 // 메시지 추가
@@ -154,7 +184,7 @@ function updateChatDisplay() {
 
     if (message.role === "system") {
       messageDiv.className = "system-message";
-      messageDiv.innerHTML = `<i class="fas fa-info-circle"></i> ${escapeHtml(message.content)}`;
+      messageDiv.innerHTML = `${escapeHtml(message.content)}`;
     } else {
       messageDiv.className = `message ${message.role}`;
       const avatar = message.role === "user" ? "👤" : "🤖";
@@ -278,7 +308,7 @@ function updateConversationList() {
       id === currentConversationId ? "active" : ""
     }`;
     button.setAttribute("data-id", id);
-    button.innerHTML = `<i class="fas fa-comment"></i> ${conversations[id].title}`;
+    button.innerHTML = `${conversations[id].title}`;
     button.addEventListener("click", () => switchConversation(id));
     conversationList.appendChild(button);
   });
