@@ -14,5 +14,7 @@ COPY . .
 # collectstatic 실행 (배포 시)
 RUN python manage.py collectstatic --noinput
 
-# Django 포트 노출
+# Gunicorn으로 실행
+CMD ["gunicorn", "skn4th.wsgi:application", "--bind", "0.0.0.0:8000"]
+
 EXPOSE 8000
