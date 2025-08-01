@@ -1,5 +1,5 @@
 # Python 기반 이미지
-FROM python:3.11-slim
+FROM python:3.12-slim
 
 # 작업 디렉토리 설정
 WORKDIR /app
